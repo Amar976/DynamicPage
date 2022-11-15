@@ -8,8 +8,8 @@ async function get(query, limit) {
     const client = new MongoClient(dbConfig.url);
     try {
       await client.connect();
-      const db = client.db(dbConfig.dbName);
-
+      //const db = client.db(dbConfig.dbName);
+      const db = client.db();
       const items = db.collection('users').find(query);
 
       if (limit > 0) {
@@ -29,8 +29,8 @@ async function getById(email) {
     const client = new MongoClient(dbConfig.url);
     try {
       await client.connect();
-      const db = client.db(dbConfig.dbName);
-
+      //const db = client.db(dbConfig.dbName);
+      const db = client.db();
       const item = await db.collection('users').findOne({ email });
       resolve(item);
       client.close();
@@ -46,8 +46,8 @@ async function add(item) {
     const client = new MongoClient(dbConfig.url);
     try {
       await client.connect();
-      const db = client.db(dbConfig.dbName);
-
+      //const db = client.db(dbConfig.dbName);
+      const db = client.db();
       const addedItem = await db.collection('users').insertOne(item);
 
       resolve(addedItem);
@@ -64,8 +64,8 @@ async function update(id, newItem) {
     const client = new MongoClient(dbConfig.url);
     try {
       await client.connect();
-      const db = client.db(dbConfig.dbName);
-
+      //const db = client.db(dbConfig.dbName);
+      const db = client.db();
       const updatedItem = await db.collection('users').findOneAndReplace({ _id: ObjectID(id) }, newItem, { returnOriginal: false });
       resolve(updatedItem.value);
 
@@ -81,8 +81,8 @@ async function remove(id) {
     const client = new MongoClient(dbConfig.url);
     try {
       await client.connect();
-      const db = client.db(dbConfig.dbName);
-
+      //const db = client.db(dbConfig.dbName);
+      const db = client.db();
       const removed = await db.collection('users').deleteOne({ _id: ObjectID(id) });
       resolve(removed.deletedCount === 1);
 
@@ -99,8 +99,8 @@ async function loadData(data) {
     const client = new MongoClient(dbConfig.url);
     try {
       await client.connect();
-      const db = client.db(dbConfig.dbName);
-
+      //const db = client.db(dbConfig.dbName);
+      const db = client.db();
       const results = await db.collection('users').insertMany(data);
       resolve(results);
       client.close();

@@ -1,4 +1,5 @@
-const claims = require('../services/db.service');
+const claims = require('../services/claims.service');
+const mongoose = require('mongoose');
 
 async function get(req, res, next) {
   try {
