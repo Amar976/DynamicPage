@@ -1,92 +1,52 @@
-const {MongoClient, ObjectID} = require('mongodb');
-//const { default: mongoose } = require('mongoose');
+const claims = require('../services/claims.service');
+//const mongoose = require('mongoose');
 //const Claims = require('../DynamicPage/src/models/claims');
 
-const dbConfig = require('../configs/db.config');
-const helper = require('../utils/helper.util');
-
-async function add(item) {
-    return new Promise(async (resolve, reject) => {
-      const client = new MongoClient(dbConfig.url);
-      try {
-        await client.connect();
-        const db = client.db();
-  
-        const addedItem = await db.collection('claims').insertOne(item);
-  
-        resolve(addedItem.ops[0]);
-        //client.close();
-      } catch (error) {
-        reject(error)
-      }
-    });
-  
+async function get(req, res, next) {
+  try {
+      res.json(await claims.get(req.query.page));
+      claimDetails = await claims.getById(req.user.email);
+  } catch (err) {
+      console.error(`Error while getting claims`, err.message);
+      next(err);
   }
-
-  async function get(query, limit) {
-    return new Promise(async (resolve, reject) => {
-      const client = new MongoClient(dbConfig.url);
-      try {
-        await client.connect();
-        const db = client.db();
-  
-        const items = db.collection('claims').find(query);
-  
-        if (limit > 0) {
-          items = items.limit(limit);
-        }
-        resolve(await items.toArray());
-        client.close();
-      } catch (error) {
-        reject(error)
-      }
-  
-    });}
-
-    async function update(email, claimsDetails) {
-      return new Promise(async (resolve, reject) => {
-        const client = new MongoClient(dbConfig.url);
-        try {
-    
-          await client.connect();
-          const db = client.db(dbConfig.dbName);      
-         
-          const updatedItem = await db.collection('claims').insertOne({claimsDetails });
-          //const updatedItem = await db.collection('users').findOneAndUpdate({claimsDetails,claimsDetails });
-          resolve(updatedItem.value);
-          console.log('updated item',updatedItem);
-          console.log('updated item value',updatedItem.value);
-    
-          //client.close();
-        } catch (error) {
-          reject(error)
-        }
-      });
-    }
-
-    
-async function getById(email) {
-  return new Promise(async (resolve, reject) => {
-    const client = new MongoClient(dbConfig.url);
-    try {
-      await client.connect();
-      const db = client.db(dbConfig.dbName);
-      //const db = client.db();
-      const item = await db.collection('users').findOne({ email });
-      resolve(item);
-      client.close();
-    } catch (error) {
-      reject(error)
-    }
-  });
-
 }
 
-  module.exports = {
-    //loadData,
-    get,
-    getById,
-    add,
-    update,
-    //remove
+async function create(req, res, next) {
+  try {
+    res.json(await claims.add(req.body));
+  } catch (err) {
+    console.error(`Error while creating claims`, err.message);
+    next(err);
   }
+}
+
+async function update(req, res, next) {
+  console.log(req.body);
+  const userDetails = await claims.getById(req.body.email);
+  console.log('userDetails',userDetails);
+  emailvalue=req.body.email;
+  try {
+    res.json(await claims.update(req.body.email, req.body));
+    //claimDetails = await claims.getById(req.user.email);
+  } catch (err) {
+    console.error(`Error while updating claims`, err.message);
+    next(err);
+  }
+}
+
+async function remove(req, res, next) {
+  try {
+    res.json(await claims.remove(req.params.id));
+  } catch (err) {
+    console.error(`Error while deleting claims`, err.message);
+    next(err);
+  }
+}
+
+module.exports = {
+  get,
+  create,
+  update,
+  remove
+};
